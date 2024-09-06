@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
 
 import cv2
 import os
@@ -12,52 +7,27 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import random
 
-
-# In[2]:
-
-
 import warnings
 warnings.filterwarnings('ignore')
-
-
-# In[3]:
 
 
 train = pd.read_csv('/kaggle/input/applications-of-deep-learning-wustl-fall-2023/train.csv')
 
 
-# In[4]:
-
-
 test = pd.read_csv('/kaggle/input/applications-of-deep-learning-wustl-fall-2023/test.csv')
-
-
-# In[5]:
 
 
 train.head()
 
 
-# In[6]:
-
-
 train.shape,test.shape
-
-
-# In[7]:
 
 
 test.head()
 
 
-# In[8]:
-
-
 img = cv2.imread('/kaggle/input/applications-of-deep-learning-wustl-fall-2023/10005.jpg')
 plt.imshow(img)
-
-
-# In[9]:
 
 
 from PIL import Image
@@ -66,33 +36,18 @@ img = Image.open('/kaggle/input/applications-of-deep-learning-wustl-fall-2023/10
 img
 
 
-# In[10]:
-
-
 img = cv2.imread('/kaggle/input/applications-of-deep-learning-wustl-fall-2023/10005.jpg')
 img
 
 
-# In[11]:
-
-
 img_path = '/kaggle/input/applications-of-deep-learning-wustl-fall-2023'
-
-
-# In[12]:
 
 
 random_files = train.sample(16)
 random_files['file']
 
 
-# In[13]:
-
-
 random_files['file'].iloc[0]
-
-
-# In[14]:
 
 
 files = os.listdir(img_path)
@@ -109,9 +64,6 @@ plt.tight_layout()
 plt.show()
 
 
-# In[15]:
-
-
 def pre_img(df, img_path, size=128):
     X=[]
     for img in df:
@@ -124,23 +76,14 @@ def pre_img(df, img_path, size=128):
     return X
 
 
-# In[16]:
-
-
 X_train = pre_img(train['file'],img_path)
 y_train = train['glasses']
-
-
-# In[17]:
 
 
 from keras.models import Sequential
 from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D, Dropout,BatchNormalization
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.metrics import r2_score, mean_squared_error
-
-
-# In[18]:
 
 
 size=128
@@ -172,36 +115,21 @@ model.summary()
 early_stopping = EarlyStopping(monitor='val_loss',patience=5,verbose=1)
 
 
-# In[19]:
-
-
 from sklearn.model_selection import train_test_split
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
 
-# In[20]:
-
-
 history = model.fit(X_train, y_train, validation_data=(X_val,y_val), epochs=50, batch_size=32, callbacks=[early_stopping], verbose=1)
-
-
-# In[21]:
 
 
 submission=pd.read_csv('/kaggle/input/applications-of-deep-learning-wustl-fall-2023/sample_submission.csv')
 submission.head()
 
 
-# In[22]:
-
-
 X_test=pre_img(test['file'],img_path)
 submission['glasses']=model.predict(X_test).round().astype(int)
 submission.to_csv('submission.csv',index=False)
 submission.head()
-
-
-# In[23]:
 
 
 model.save("model_glass.keras")
